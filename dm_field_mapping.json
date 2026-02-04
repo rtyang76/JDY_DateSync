@@ -1,0 +1,92 @@
+{
+  "_comment": "DM客户数据库字段映射配置",
+  "_instructions": [
+    "1. 左侧是客户数据库的实际字段名",
+    "2. 右侧是本地数据库的字段名"
+
+  ],
+  "main_table": {
+    "source_to_local": {
+      "id": "source_id",
+      "order_no": "order_no",
+      "month_settlement": "month_settlement",
+      "factory": "factory",
+      "person_in_charge": "person_in_charge",
+      "currency": "currency",
+      "mark": "mark",
+      "tax_rate": "tax_rate",
+      "payment_terms": "payment_terms",
+      "remarks": "remarks",
+      "in_warehouse": "in_warehouse",
+      "material_warehouse": "material_warehouse",
+      "original_terms": "original_terms",
+      "total_quantity": "total_quantity",
+      "total_tax_amount": "total_tax_amount",
+      "department": "department",
+      "creator": "creator",
+      "auditor": "auditor",
+      "approver": "approver",
+      "submit_time": "submit_time",
+      "modify_time": "modify_time",
+      "order_status": "order_status"
+    },
+    "_field_descriptions": {
+      "id": "客户系统主键ID",
+      "order_no": "工单号/订单号",
+      "month_settlement": "月结信息",
+      "factory": "工厂名称/加工厂",
+      "person_in_charge": "负责人",
+      "currency": "币种/货币",
+      "mark": "标记",
+      "tax_rate": "税率",
+      "payment_terms": "付款条件/账期",
+      "remarks": "备注",
+      "in_warehouse": "入库仓库",
+      "material_warehouse": "物料仓库",
+      "original_terms": "原始条款/原账期",
+      "total_quantity": "数量合计/总数量",
+      "total_tax_amount": "含税金额合计/总含税金额",
+      "department": "制单部门/部门",
+      "creator": "制单人/创建人",
+      "auditor": "审核人",
+      "approver": "批准人",
+      "submit_time": "提交时间/填单时间",
+      "modify_time": "修改时间（必填，用于增量同步）",
+      "order_status": "订单状态/工单状态"
+    }
+  },
+  "detail_table": {
+    "source_to_local": {
+      "line_no": "line_no",
+      "material_code": "material_code",
+      "material_desc": "material_desc",
+      "quantity": "quantity",
+      "unit_price": "unit_price",
+      "tax_unit_price": "tax_unit_price",
+      "tax_amount": "tax_amount",
+      "price_book": "price_book",
+      "suggested_quantity": "suggested_quantity",
+      "source_doc_no": "source_doc_no",
+      "modify_time": "modify_time"
+    },
+    "_field_descriptions": {
+      "line_no": "行号/序号",
+      "material_code": "物料编码",
+      "material_desc": "物料描述/物料名称",
+      "quantity": "数量",
+      "unit_price": "单价",
+      "tax_unit_price": "含税单价",
+      "tax_amount": "含税金额",
+      "price_book": "价格手册/价格本",
+      "suggested_quantity": "建议数量",
+      "source_doc_no": "来源单号/源单号",
+      "modify_time": "修改时间"
+    }
+  },
+  "_deployment_notes": {
+    "step1": "连接客户数据库，查询字段名：SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='主表名'",
+    "step2": "对照上面的字段说明，修改左侧的字段名为客户实际字段名",
+    "step3": "保存文件后重新编译：mvn clean package -DskipTests",
+    "step4": "测试数据拉取：java -jar target/api_sql-1.0-SNAPSHOT-jar-with-dependencies.jar dm"
+  }
+}
