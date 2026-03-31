@@ -50,15 +50,15 @@ public class DmJdySyncService {
 
     /**
      * 执行DM数据推送到简道云
+     * @return 是否有数据需要同步
      */
-    public void pushDataToJiandaoyun() {
+    public boolean pushDataToJiandaoyun() {
         try {
             // 1. 查询待同步的订单
             List<org.example.dm.model.DmOrder> pendingOrders = localDao.queryPendingOrders();
 
             if (pendingOrders.isEmpty()) {
-                LogUtil.logInfo("[DM推送] 无待同步数据");
-                return;
+                return false;
             }
 
             // 有数据时才输出详细日志
@@ -73,10 +73,12 @@ public class DmJdySyncService {
 
             System.out.println("=== DM数据推送简道云完成 ===");
             LogUtil.logInfo("DM数据推送简道云完成: 成功 " + successCount + " 条");
+            return true;
 
         } catch (Exception e) {
             LogUtil.logError("DM数据推送简道云异常: " + e.getMessage());
             e.printStackTrace();
+            return false;
         }
     }
 

@@ -5,12 +5,13 @@ package org.example.service;
  * 定义同步服务的方法
  */
 public interface SyncService {
-    
+
     /**
      * 执行同步过程
+     * @return 是否有数据需要同步
      */
-    void syncProcess();
-    
+    boolean syncProcess();
+
     /**
      * 获取自定义码
      * @param currentDate 当前日期
@@ -18,4 +19,4 @@ public interface SyncService {
      * @return 自定义码
      */
     String getCustomCode(java.time.LocalDate currentDate, int lastCount);
-} 
+}

@@ -167,24 +167,24 @@ public class SyncApplication {
         @Override
         public void run() {
             try {
-                String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                LogUtil.logInfo("=== 定时同步任务开始 " + timestamp + " ===");
-
                 // 阶段1: 推送DM数据到简道云（本地数据库 → 简道云）
                 // 注：DM数据现在通过EDI推送服务接收，不再需要远程拉取
-                dmJdySyncService.pushDataToJiandaoyun();
+                boolean dmHasData = dmJdySyncService.pushDataToJiandaoyun();
 
                 // 阶段2: 同步MSD数据（本地数据库 → 简道云）
                 // 执行订单同步
-                orderSyncService.syncProcess();
+                boolean orderHasData = orderSyncService.syncProcess();
 
                 // 执行物料同步
-                itemSyncService.syncProcess();
+                boolean itemHasData = itemSyncService.syncProcess();
 
                 // 执行采购物料通知单同步
-                deliveryNoticeSyncService.syncProcess();
+                boolean deliveryHasData = deliveryNoticeSyncService.syncProcess();
 
-                LogUtil.logInfo("=== 定时同步任务完成 " + timestamp + " ===");
+                // 如果所有服务都没有数据，输出一行汇总日志
+                if (!dmHasData && !orderHasData && !itemHasData && !deliveryHasData) {
+                    LogUtil.logInfo("[定时同步] 无新数据需要同步");
+                }
 
             } catch (Exception e) {
                 LogUtil.logError("同步过程发生异常: " + e.getMessage());

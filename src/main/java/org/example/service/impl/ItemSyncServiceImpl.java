@@ -63,7 +63,7 @@ public class ItemSyncServiceImpl implements ItemSyncService {
     }
 
     @Override
-    public void syncProcess() {
+    public boolean syncProcess() {
         try {
             // 获取上次同步ID
             Integer lastSyncId = getLastItemSyncId();
@@ -72,8 +72,7 @@ public class ItemSyncServiceImpl implements ItemSyncService {
             List<Map<String, Object>> newData = fetchNewItemData(lastSyncId);
 
             if (newData.isEmpty()) {
-                LogUtil.logInfo("[MSD物料同步] 无新数据");
-                return;
+                return false;
             }
 
             // 有数据时才输出详细日志
@@ -83,9 +82,11 @@ public class ItemSyncServiceImpl implements ItemSyncService {
 
             // 处理数据
             processItemData(newData);
+            return true;
 
         } catch (Exception e) {
             LogUtil.logError("物料同步过程异常: " + e.getMessage());
+            return false;
         }
     }
 

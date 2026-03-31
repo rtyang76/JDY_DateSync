@@ -1,0 +1,9 @@
+# SVN 元数据
+.svn/
+
+# 其他要忽略的
+.DS_Store
+.idea/
+*.iml
+target/
+*.class

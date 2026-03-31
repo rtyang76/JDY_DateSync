@@ -58,7 +58,7 @@ public class DeliveryNoticeSyncServiceImpl implements DeliveryNoticeSyncService 
     }
     
     @Override
-    public void syncProcess() {
+    public boolean syncProcess() {
         try {
             // 获取上次同步ID
             Integer lastSyncId = getLastDeliverySyncId();
@@ -67,8 +67,7 @@ public class DeliveryNoticeSyncServiceImpl implements DeliveryNoticeSyncService 
             List<Map<String, Object>> newData = fetchNewDeliveryData(lastSyncId);
 
             if (newData.isEmpty()) {
-                LogUtil.logInfo("[MSD采购物料通知单同步] 无新数据");
-                return;
+                return false;
             }
 
             // 有数据时才输出详细日志
@@ -143,10 +142,12 @@ public class DeliveryNoticeSyncServiceImpl implements DeliveryNoticeSyncService 
             }
 
             System.out.println("=== 采购物料通知单同步完成，处理 " + totalProcessed + " 条数据 ===");
+            return true;
 
         } catch (Exception e) {
             LogUtil.logError("采购物料通知单同步异常: " + e.getMessage());
             e.printStackTrace();
+            return false;
         }
     }
 
