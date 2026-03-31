@@ -46,3 +46,9 @@ build/
 *.iml
 target/
 *.class
+
+# 编译生成的文件
+*.class
+
+# 临时文件
+git.gitignore
