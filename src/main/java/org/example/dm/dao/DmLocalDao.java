@@ -48,7 +48,6 @@ public class DmLocalDao {
             LogUtil.logError("获取DM同步时间戳失败: " + e.getMessage());
         }
         
-        // 如果没有记录，返回7天前
         return LocalDateTime.now().minusDays(7);
     }
     
@@ -136,9 +135,11 @@ public class DmLocalDao {
                      "total_quantity, total_tax_amount, " +
                      "department, creator, auditor, approver, " +
                      "submit_time, modify_time, order_status, " +
+                     "i_ord, fill_date, price_book, responsible_department, " +
+                     "current_payment_date, original_payment_date, document_type, " +
                      "sync_status, created_time, updated_time" +
                      ") VALUES (" +
-                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE()" +
+                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE()" +
                      ")";
         
         try (Connection conn = DatabaseConnectionPool.getConnection();
@@ -173,7 +174,32 @@ public class DmLocalDao {
             
             pstmt.setTimestamp(idx++, Timestamp.valueOf(order.getModifyTime()));
             pstmt.setInt(idx++, order.getOrderStatus());
-            pstmt.setInt(idx++, 0); // sync_status = 0 (待同步)
+            
+            pstmt.setString(idx++, order.getIOrd());
+            
+            if (order.getFillDate() != null) {
+                pstmt.setTimestamp(idx++, Timestamp.valueOf(order.getFillDate()));
+            } else {
+                pstmt.setNull(idx++, Types.TIMESTAMP);
+            }
+            
+            pstmt.setString(idx++, order.getPriceBook());
+            pstmt.setString(idx++, order.getResponsibleDepartment());
+            
+            if (order.getCurrentPaymentDate() != null) {
+                pstmt.setTimestamp(idx++, Timestamp.valueOf(order.getCurrentPaymentDate()));
+            } else {
+                pstmt.setNull(idx++, Types.TIMESTAMP);
+            }
+            
+            if (order.getOriginalPaymentDate() != null) {
+                pstmt.setTimestamp(idx++, Timestamp.valueOf(order.getOriginalPaymentDate()));
+            } else {
+                pstmt.setNull(idx++, Types.TIMESTAMP);
+            }
+            
+            pstmt.setString(idx++, order.getDocumentType());
+            pstmt.setInt(idx++, 0);
             
             int rowsAffected = pstmt.executeUpdate();
             
@@ -205,6 +231,8 @@ public class DmLocalDao {
                      "total_quantity = ?, total_tax_amount = ?, " +
                      "department = ?, creator = ?, auditor = ?, approver = ?, " +
                      "submit_time = ?, modify_time = ?, order_status = ?, " +
+                     "i_ord = ?, fill_date = ?, price_book = ?, responsible_department = ?, " +
+                     "current_payment_date = ?, original_payment_date = ?, document_type = ?, " +
                      "sync_status = 0, updated_time = GETDATE() " +
                      "WHERE id = ?";
         
@@ -240,6 +268,31 @@ public class DmLocalDao {
             
             pstmt.setTimestamp(idx++, Timestamp.valueOf(order.getModifyTime()));
             pstmt.setInt(idx++, order.getOrderStatus());
+            
+            pstmt.setString(idx++, order.getIOrd());
+            
+            if (order.getFillDate() != null) {
+                pstmt.setTimestamp(idx++, Timestamp.valueOf(order.getFillDate()));
+            } else {
+                pstmt.setNull(idx++, Types.TIMESTAMP);
+            }
+            
+            pstmt.setString(idx++, order.getPriceBook());
+            pstmt.setString(idx++, order.getResponsibleDepartment());
+            
+            if (order.getCurrentPaymentDate() != null) {
+                pstmt.setTimestamp(idx++, Timestamp.valueOf(order.getCurrentPaymentDate()));
+            } else {
+                pstmt.setNull(idx++, Types.TIMESTAMP);
+            }
+            
+            if (order.getOriginalPaymentDate() != null) {
+                pstmt.setTimestamp(idx++, Timestamp.valueOf(order.getOriginalPaymentDate()));
+            } else {
+                pstmt.setNull(idx++, Types.TIMESTAMP);
+            }
+            
+            pstmt.setString(idx++, order.getDocumentType());
             pstmt.setInt(idx++, orderId);
             
             int rowsAffected = pstmt.executeUpdate();
@@ -290,8 +343,9 @@ public class DmLocalDao {
                      "order_id, order_no, line_no, material_code, material_desc, " +
                      "quantity, unit_price, tax_unit_price, tax_amount, price_book, " +
                      "suggested_quantity, source_doc_no, modify_time, " +
-                     "sync_status, created_time, updated_time" +
-                     ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, GETDATE(), GETDATE())";
+                     "source_id, i_ord, same_auxiliary, update_mark, expand_mark, " +
+                     "created_time, updated_time" +
+                     ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
         
         int successCount = 0;
         
@@ -319,6 +373,17 @@ public class DmLocalDao {
                 pstmt.setBigDecimal(idx++, detail.getSuggestedQuantity());
                 pstmt.setString(idx++, detail.getSourceDocNo());
                 pstmt.setTimestamp(idx++, Timestamp.valueOf(detail.getModifyTime()));
+                
+                if (detail.getSourceId() != null) {
+                    pstmt.setInt(idx++, detail.getSourceId());
+                } else {
+                    pstmt.setNull(idx++, Types.INTEGER);
+                }
+                
+                pstmt.setString(idx++, detail.getIOrd());
+                pstmt.setString(idx++, detail.getSameAuxiliary());
+                pstmt.setString(idx++, detail.getUpdateMark());
+                pstmt.setString(idx++, detail.getExpandMark());
                 
                 pstmt.addBatch();
             }
@@ -384,6 +449,28 @@ public class DmLocalDao {
                 order.setSyncAttempts(rs.getInt("sync_attempts"));
                 order.setSyncError(rs.getString("sync_error"));
                 
+                order.setIOrd(rs.getString("i_ord"));
+                
+                Timestamp fillDate = rs.getTimestamp("fill_date");
+                if (fillDate != null) {
+                    order.setFillDate(fillDate.toLocalDateTime());
+                }
+                
+                order.setPriceBook(rs.getString("price_book"));
+                order.setResponsibleDepartment(rs.getString("responsible_department"));
+                
+                Timestamp currentPaymentDate = rs.getTimestamp("current_payment_date");
+                if (currentPaymentDate != null) {
+                    order.setCurrentPaymentDate(currentPaymentDate.toLocalDateTime());
+                }
+                
+                Timestamp originalPaymentDate = rs.getTimestamp("original_payment_date");
+                if (originalPaymentDate != null) {
+                    order.setOriginalPaymentDate(originalPaymentDate.toLocalDateTime());
+                }
+                
+                order.setDocumentType(rs.getString("document_type"));
+                
                 orders.add(order);
             }
         } catch (SQLException e) {
@@ -430,6 +517,16 @@ public class DmLocalDao {
                 detail.setSuggestedQuantity(rs.getBigDecimal("suggested_quantity"));
                 detail.setSourceDocNo(rs.getString("source_doc_no"));
                 detail.setModifyTime(rs.getTimestamp("modify_time").toLocalDateTime());
+                
+                Integer sourceId = rs.getInt("source_id");
+                if (!rs.wasNull()) {
+                    detail.setSourceId(sourceId);
+                }
+                
+                detail.setIOrd(rs.getString("i_ord"));
+                detail.setSameAuxiliary(rs.getString("same_auxiliary"));
+                detail.setUpdateMark(rs.getString("update_mark"));
+                detail.setExpandMark(rs.getString("expand_mark"));
                 
                 details.add(detail);
             }
@@ -501,7 +598,6 @@ public class DmLocalDao {
         try (Connection conn = DatabaseConnectionPool.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
-            // 限制错误信息长度，避免超出数据库字段限制
             String truncatedError = error;
             if (error != null && error.length() > 500) {
                 truncatedError = error.substring(0, 500);

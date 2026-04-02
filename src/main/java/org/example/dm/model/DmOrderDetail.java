@@ -26,7 +26,12 @@ public class DmOrderDetail {
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
     
-    // Getters and Setters
+    private Integer sourceId;
+    private String iOrd;
+    private String sameAuxiliary;
+    private String updateMark;
+    private String expandMark;
+    
     public Integer getId() {
         return id;
     }
@@ -169,5 +174,45 @@ public class DmOrderDetail {
     
     public void setUpdatedTime(LocalDateTime updatedTime) {
         this.updatedTime = updatedTime;
+    }
+    
+    public Integer getSourceId() {
+        return sourceId;
+    }
+    
+    public void setSourceId(Integer sourceId) {
+        this.sourceId = sourceId;
+    }
+    
+    public String getIOrd() {
+        return iOrd;
+    }
+    
+    public void setIOrd(String iOrd) {
+        this.iOrd = iOrd;
+    }
+    
+    public String getSameAuxiliary() {
+        return sameAuxiliary;
+    }
+    
+    public void setSameAuxiliary(String sameAuxiliary) {
+        this.sameAuxiliary = sameAuxiliary;
+    }
+    
+    public String getUpdateMark() {
+        return updateMark;
+    }
+    
+    public void setUpdateMark(String updateMark) {
+        this.updateMark = updateMark;
+    }
+    
+    public String getExpandMark() {
+        return expandMark;
+    }
+    
+    public void setExpandMark(String expandMark) {
+        this.expandMark = expandMark;
     }
 }

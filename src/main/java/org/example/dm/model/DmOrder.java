@@ -38,10 +38,16 @@ public class DmOrder {
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
     
-    // 子表数据
+    private String iOrd;
+    private LocalDateTime fillDate;
+    private String priceBook;
+    private String responsibleDepartment;
+    private LocalDateTime currentPaymentDate;
+    private LocalDateTime originalPaymentDate;
+    private String documentType;
+    
     private List<DmOrderDetail> details = new ArrayList<>();
     
-    // Getters and Setters
     public Integer getId() {
         return id;
     }
@@ -264,6 +270,62 @@ public class DmOrder {
     
     public void setUpdatedTime(LocalDateTime updatedTime) {
         this.updatedTime = updatedTime;
+    }
+    
+    public String getIOrd() {
+        return iOrd;
+    }
+    
+    public void setIOrd(String iOrd) {
+        this.iOrd = iOrd;
+    }
+    
+    public LocalDateTime getFillDate() {
+        return fillDate;
+    }
+    
+    public void setFillDate(LocalDateTime fillDate) {
+        this.fillDate = fillDate;
+    }
+    
+    public String getPriceBook() {
+        return priceBook;
+    }
+    
+    public void setPriceBook(String priceBook) {
+        this.priceBook = priceBook;
+    }
+    
+    public String getResponsibleDepartment() {
+        return responsibleDepartment;
+    }
+    
+    public void setResponsibleDepartment(String responsibleDepartment) {
+        this.responsibleDepartment = responsibleDepartment;
+    }
+    
+    public LocalDateTime getCurrentPaymentDate() {
+        return currentPaymentDate;
+    }
+    
+    public void setCurrentPaymentDate(LocalDateTime currentPaymentDate) {
+        this.currentPaymentDate = currentPaymentDate;
+    }
+    
+    public LocalDateTime getOriginalPaymentDate() {
+        return originalPaymentDate;
+    }
+    
+    public void setOriginalPaymentDate(LocalDateTime originalPaymentDate) {
+        this.originalPaymentDate = originalPaymentDate;
+    }
+    
+    public String getDocumentType() {
+        return documentType;
+    }
+    
+    public void setDocumentType(String documentType) {
+        this.documentType = documentType;
     }
     
     public List<DmOrderDetail> getDetails() {
